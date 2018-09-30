@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Windows;
 using System.Windows.Input;
 
 namespace Answer
@@ -20,23 +21,23 @@ namespace Answer
         }
         public ICommand LeftTopPoint => new DelegateCommand(() =>
         {
-            LeftTopTextX = WindowLeft;
-            LeftTopTextY = WindowTop;
+            LeftTopText.X = (int)WindowLeft;
+            LeftTopText.Y = (int)WindowTop;
         });
         public ICommand RightTopPoint => new DelegateCommand(() =>
         {
-            RightTopTextX = WindowLeft;
-            RightTopTextY = WindowTop;
+            RightTopText.X = (int)WindowLeft;
+            RightTopText.Y = (int)WindowTop;
         });
         public ICommand LeftBottomPoint => new DelegateCommand(() =>
         {
-            LeftBottomTextX = WindowLeft;
-            LeftBottomTextY = WindowTop;
+            LeftBottomText.X = (int)WindowLeft;
+            LeftBottomText.Y = (int)WindowTop;
         });
         public ICommand RightBottomPoint => new DelegateCommand(() =>
         {
-            RightBottomTextX = WindowLeft;
-            RightBottomTextY = WindowTop;
+            RightBottomText.X = (int)WindowLeft;
+            RightBottomText.Y = (int)WindowTop;
         });
         public ICommand RunAnalyzeResult => new DelegateCommand(() =>
         {
@@ -61,7 +62,7 @@ namespace Answer
                 var SECRET_KEY = "vys5QWFCD5293VUXK7GGIa8wHPpL4PI9";
                 var client = new Baidu.Aip.Ocr.Ocr(API_KEY, SECRET_KEY);
                 client.Timeout = 60000;
-                var img = CaptureScreen((int)LeftTopTextX, (int)LeftTopTextY, (int)RightTopTextX - (int)LeftTopTextX, (int)LeftBottomTextY - (int)LeftTopTextY);
+                var img = CaptureScreen(LeftTopText.X, LeftTopText.Y, RightTopText.X - LeftTopText.X, LeftBottomText.Y - LeftTopText.Y);
                 var image = getBytesByBitmap(img);//System.IO.File.ReadAllBytes("D:\\1.png");
                 var result = client.GeneralBasic(image);
                 var a = JsonConvert.DeserializeObject<AnalyzeHelper>(result.ToString());
@@ -75,15 +76,15 @@ namespace Answer
                     }
                     ResultText += text;
                 }
-                //var aa = HttpRequest.GetHttpResponse($"http://tapi.gfun.me/nsh/kj/api.php?text={ResultText.Substring(0, ResultText.Length > 10 ? 10 : ResultText.Length)}");
-                //AnalyzeList.Clear();
-                //AnalyzeList.AddRange(JsonConvert.DeserializeObject<ObservableCollection<AnalyzeResult>>(aa));
-                //ResultText += aa;
             }
             catch (Exception ex)
             {
                 ResultText += "报错,原因：" + ex.Message;
             }
+        });
+        public ICommand CapturePoint => new DelegateCommand(() =>
+        {
+            new CapturePoint(LeftTopText, RightTopText, LeftBottomText, RightBottomText).Show();
         });
 
         public ObservableCollection<AnalyzeResult> AnalyzeList { get; set; } = new ObservableCollection<AnalyzeResult>();
@@ -93,7 +94,7 @@ namespace Answer
             Bitmap bmp = new Bitmap(width, height);
             using (Graphics g = Graphics.FromImage(bmp))
             {
-                g.CopyFromScreen(new Point(x, y), new Point(0, 0), bmp.Size);
+                g.CopyFromScreen(new System.Drawing.Point(x, y), new System.Drawing.Point(0, 0), bmp.Size);
                 g.Dispose();
             }
             return bmp;
@@ -136,7 +137,7 @@ namespace Answer
             }
         }
 
-        private double windowLeft = 0;
+        private double windowLeft = SystemParameters.WorkArea.Width*0.4;
         public double WindowLeft
         {
             get
@@ -150,7 +151,7 @@ namespace Answer
             }
         }
 
-        private double windowTop = 0;
+        private double windowTop = SystemParameters.WorkArea.Height*0.4;
         public double WindowTop
         {
             get
@@ -163,117 +164,10 @@ namespace Answer
                 OnPropertyChanged("WindowTop");
             }
         }
-
-        private double leftTopTextX = 0;
-        public double LeftTopTextX
-        {
-            get
-            {
-                return leftTopTextX;
-            }
-            set
-            {
-                leftTopTextX = value;
-                OnPropertyChanged("LeftTopTextX");
-            }
-        }
-
-        private double rightTopTextX = 0;
-        public double RightTopTextX
-        {
-            get
-            {
-                return rightTopTextX;
-            }
-            set
-            {
-                rightTopTextX = value;
-                OnPropertyChanged("RightTopTextX");
-            }
-        }
-
-        private double leftBottomTextX = 0;
-        public double LeftBottomTextX
-        {
-            get
-            {
-                return leftBottomTextX;
-            }
-            set
-            {
-                leftBottomTextX = value;
-                OnPropertyChanged("LeftBottomTextX");
-            }
-        }
-
-        private double rightBottomTextX = 0;
-        public double RightBottomTextX
-        {
-            get
-            {
-                return rightBottomTextX;
-            }
-            set
-            {
-                rightBottomTextX = value;
-                OnPropertyChanged("RightBottomTextX");
-            }
-        }
-
-        private double leftTopTextY = 0;
-        public double LeftTopTextY
-        {
-            get
-            {
-                return leftTopTextY;
-            }
-            set
-            {
-                leftTopTextY = value;
-                OnPropertyChanged("LeftTopTextY");
-            }
-        }
-
-        private double rightTopTextY = 0;
-        public double RightTopTextY
-        {
-            get
-            {
-                return rightTopTextY;
-            }
-            set
-            {
-                rightTopTextY = value;
-                OnPropertyChanged("RightTopTextY");
-            }
-        }
-
-        private double leftBottomTextY = 0;
-        public double LeftBottomTextY
-        {
-            get
-            {
-                return leftBottomTextY;
-            }
-            set
-            {
-                leftBottomTextY = value;
-                OnPropertyChanged("LeftBottomTextY");
-            }
-        }
-
-        private double rightBottomTextY = 0;
-        public double RightBottomTextY
-        {
-            get
-            {
-                return rightBottomTextY;
-            }
-            set
-            {
-                rightBottomTextY = value;
-                OnPropertyChanged("RightBottomTextY");
-            }
-        }
+        
+        public Point LeftTopText { get; } = new Point(0,0);
+        public Point RightTopText { get; } = new Point((int)SystemParameters.WorkArea.Width,0);
+        public Point LeftBottomText { get; } = new Point(0,(int)SystemParameters.WorkArea.Height);
+        public Point RightBottomText { get; } = new Point((int)SystemParameters.WorkArea.Width, (int)SystemParameters.WorkArea.Height);
     }
 }
